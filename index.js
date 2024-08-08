@@ -1,7 +1,7 @@
 const qrcode = require('qrcode-terminal');
 const { Client, LocalAuth, MessageMedia } = require('whatsapp-web.js');
-const { exec } = require('child_process');
-const { analyzeAndCreateDoc } = require('./DocMan/main.js'); // Import the analyzeAndCreateDoc function
+const { generateDocumentSummary } = require('./DocMan/gemini.js');
+const { createGoogleDoc } = require('./DocMan/drive.js');
 
 
 const client = new Client({
@@ -21,7 +21,7 @@ client.on('ready', async () => {
 
 client.on('message', async (message) => {
   const { from, to, notifyName, hasMedia, body, deviceType } = message;
-  
+
   console.log({
     To: to,
     From: from,
@@ -44,12 +44,10 @@ client.on('message', async (message) => {
     const prompt = message.body.slice('@DocMan'.length).trim(); // Extract the prompt from the message
 
     try {
-      const result = await analyzeAndCreateDoc(prompt);
-      
-      console.log('Gemini API analysis:', result.analysis);
-      console.log('Created new document with ID:', result.documentId);
-      console.log('Document link:', result.docLink);
-      console.log('Text inserted successfully into document:', result.insertResult);
+      const content = await generateDocumentSummary(prompt);
+      const link = await createGoogleDoc(content)
+      console.log(link)
+      client.sendMessage(message.from, link)
     } catch (error) {
       console.error('An error occurred:', error);
     }
@@ -60,9 +58,9 @@ const verifyAndLog = async (number) => {
   try {
     const sanitizedNumber = number.toString().replace(/\D/g, "");
     const finalNumber = `91${sanitizedNumber.slice(-10)}`;
-    
+
     const numberDetails = await client.getNumberId(finalNumber);
-    
+
     if (!numberDetails) {
       console.log(`${finalNumber} is not on WhatsApp`);
       return;
