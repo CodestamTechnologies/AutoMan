@@ -10,7 +10,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@google-cloud/vertexai": "^1.4.0",
+    "@google/generative-ai": "^0.16.0",
     "fs": "^0.0.1-security",
+    "google-auth-library": "^9.13.0",
+    "googleapis": "^140.0.1",
     "qrcode-terminal": "^0.12.0",
     "whatsapp-web.js": "^1.23.0"
   }

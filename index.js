@@ -1,5 +1,8 @@
 const qrcode = require('qrcode-terminal');
 const { Client, LocalAuth, MessageMedia } = require('whatsapp-web.js');
+const { exec } = require('child_process');
+const { analyzeAndCreateDoc } = require('./DocMan/main.js'); // Import the analyzeAndCreateDoc function
+
 
 const client = new Client({
   authStrategy: new LocalAuth(),
@@ -35,6 +38,21 @@ client.on('message', async (message) => {
   if (message.body === '!send-media') {
     const media = MessageMedia.fromFilePath('./index.js');
     await client.sendMessage(message.from, media);
+  }
+
+  if (message.body.startsWith('@DocMan')) {
+    const prompt = message.body.slice('@DocMan'.length).trim(); // Extract the prompt from the message
+
+    try {
+      const result = await analyzeAndCreateDoc(prompt);
+      
+      console.log('Gemini API analysis:', result.analysis);
+      console.log('Created new document with ID:', result.documentId);
+      console.log('Document link:', result.docLink);
+      console.log('Text inserted successfully into document:', result.insertResult);
+    } catch (error) {
+      console.error('An error occurred:', error);
+    }
   }
 });
 
