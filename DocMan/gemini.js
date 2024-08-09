@@ -1,7 +1,9 @@
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 
 async function generateDocumentSummary(inputText) {
-    const apiKey = API KEY;
+
+    // TODO : ADD API KEY
+    const apiKey = 'ADD API KEY';
     const genAI = new GoogleGenerativeAI(apiKey);
 
     const model = genAI.getGenerativeModel({
